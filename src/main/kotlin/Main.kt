@@ -10,8 +10,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
 fun BuscaminasUI() {
@@ -20,17 +21,27 @@ fun BuscaminasUI() {
 
     // Cronómetro
     LaunchedEffect(estadoJuego) {
-        while (!estadoJuego.juegoTerminado) {
+        while (estadoJuego.juegoTerminado.value == false) {
             delay(1000L)
-            if (!estadoJuego.juegoTerminado) {
-                estadoJuego.tiempoTranscurrido++
+            if (!estadoJuego.juegoTerminado.value) {
+                estadoJuego.tiempoTranscurrido.value++
             }
         }
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("Tiempo: ${estadoJuego.tiempoTranscurrido} segundos")
+        Text("Tiempo: ${estadoJuego.tiempoTranscurrido.value} segundos")
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Si el juego ha terminado, mostrar el mensaje de victoria o derrota
+        if (estadoJuego.juegoTerminado.value) {
+            Text(
+                text = if (estadoJuego.bombaExplotada.value) "¡Has perdido! 💣" else "¡Has ganado! 🎉",
+                color = if (estadoJuego.bombaExplotada.value) Color.Red else Color.Green,
+                style = MaterialTheme.typography.h6
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         estadoJuego.tablero.forEachIndexed { filaIndex, fila ->
             Row {
@@ -40,15 +51,26 @@ fun BuscaminasUI() {
                             .size(32.dp)
                             .background(
                                 when {
-                                    celda.estaRevelada -> Color.LightGray
+                                    celda.estaRevelada -> {
+                                        if (celda.tieneMina && estadoJuego.bombaExplotada.value) Color.Red else Color.LightGray
+                                    }
                                     celda.tieneBandera -> Color.Yellow
                                     else -> Color.DarkGray
                                 }
                             )
-                            .clickable {
-                                if (!celda.estaRevelada) {
-                                    estadoJuego.destapar(filaIndex, columnaIndex)
-                                }
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = {
+                                        // Para clics largos (coloca o quita la bandera)
+                                        estadoJuego.colocarBandera(filaIndex, columnaIndex)
+                                    },
+                                    onTap = {
+                                        // Para clics cortos (destapa la celda)
+                                        if (!celda.tieneBandera) {
+                                            estadoJuego.destapar(filaIndex, columnaIndex)
+                                        }
+                                    }
+                                )
                             }
                             .padding(4.dp),
                         contentAlignment = Alignment.Center

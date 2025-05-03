@@ -6,7 +6,6 @@ class Celda {
     var minasAdyacentes = 0
     var tieneBandera = false
 
-    //Reinicia valores celda
     fun resetear() {
         estaRevelada = false
         tieneMina = false
@@ -14,4 +13,3 @@ class Celda {
         tieneBandera = false
     }
 }
-

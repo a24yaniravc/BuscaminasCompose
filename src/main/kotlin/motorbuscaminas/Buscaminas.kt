@@ -4,12 +4,12 @@ import kotlin.random.Random
 
 class Buscaminas(private val filas: Int, private val columnas: Int, private val minas: Int) {
     private val tablero = Array(filas) { Array(columnas) { Celda() } }
+
     var juegoTerminado = false
         private set
     private var celdasRestantes = filas * columnas - minas
 
     init {
-        // Excepciones
         if (filas <= 1 || columnas <= 1) throw Exception("Tanto el número de filas como el de columnas deben ser mayor que 1.")
         if (minas >= filas * columnas) throw Exception("El número de minas no puede ser mayor o igual que el número de celdas.")
         colocarMinas()
@@ -84,35 +84,17 @@ class Buscaminas(private val filas: Int, private val columnas: Int, private val 
         }
     }
 
-    fun colocarBandera(fila: Int, columna: Int) {
-        if (!tablero[fila][columna].estaRevelada && !juegoTerminado) {
-            tablero[fila][columna].tieneBandera = true
-        }
-    }
-
-    fun quitarBandera(fila: Int, columna: Int) {
-        if (!juegoTerminado) {
-            tablero[fila][columna].tieneBandera = false
-        }
-    }
-
     fun obtenerTablero(): Array<Array<Celda>> = tablero
 
     fun reiniciar() {
-        // Restablecer el tablero de celdas
         for (i in 0 until filas) {
             for (j in 0 until columnas) {
-                tablero[i][j].resetear() // Resetear cada celda (aún no revelada, sin bandera)
+                tablero[i][j].resetear()
             }
         }
-
         colocarMinas()
-
         calcularMinasAdyacentes()
-
-        // Reiniciar el estado del juego
         juegoTerminado = false
         celdasRestantes = filas * columnas - minas
     }
-
 }

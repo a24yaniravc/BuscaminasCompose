@@ -1,25 +1,77 @@
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
 import motorbuscaminas.Buscaminas
-import kotlinx.coroutines.Job
 
 class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
     private val buscaminas = Buscaminas(filas, columnas, minas)
     val tablero = buscaminas.obtenerTablero()
-    var juegoTerminado by mutableStateOf(false)
-    var tiempoTranscurrido by mutableStateOf(0)
+
+    var juegoTerminado = mutableStateOf(false)
+    var bombaExplotada = mutableStateOf(false)
+    var tiempoTranscurrido = mutableStateOf(0)
 
     fun destapar(fila: Int, columna: Int) {
-        if (juegoTerminado) return
-        buscaminas.destapar(fila, columna)
-        if (buscaminas.juegoTerminado) {
-            juegoTerminado = true
+        if (juegoTerminado.value) return
+        val celda = tablero[fila][columna]
+
+        // Si se destapa una bomba, se pierde
+        if (celda.tieneMina) {
+            bombaExplotada.value = true
+            juegoTerminado.value = true
+            revelarTodoElTablero()
+        } else {
+            buscaminas.destapar(fila, columna)
+
+            // Verificar si el jugador ha ganado (todas las celdas sin mina reveladas)
+            if (!bombaExplotada.value && todasLasCeldasSegurasReveladas()) {
+                juegoTerminado.value = true
+            }
+        }
+    }
+
+    private fun todasLasCeldasSegurasReveladas(): Boolean {
+        for (fila in tablero) {
+            for (celda in fila) {
+                if (!celda.estaRevelada && !celda.tieneMina) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    private fun revelarTodoElTablero() {
+        for (fila in tablero) {
+            for (celda in fila) {
+                celda.estaRevelada = true // Revelar todas las celdas
+            }
         }
     }
 
     fun reiniciar() {
-        buscaminas.reiniciar()
-        tiempoTranscurrido = 0
-        juegoTerminado = false
+        buscaminas.reiniciar() // Reinicia el estado del tablero en la clase Buscaminas
+        tiempoTranscurrido.value = 0 // Reinicia el tiempo
+        juegoTerminado.value = false // Restablece la condición de juego terminado
+        bombaExplotada.value = false // Asegúrate de que el estado de la bomba explotada se restablezca
+
+        for (fila in tablero) {
+            for (celda in fila) {
+                celda.estaRevelada = false
+                celda.tieneBandera = false
+            }
+        }
+    }
+
+    fun colocarBandera(fila: Int, columna: Int) {
+        val celda = tablero[fila][columna]
+        if (!celda.estaRevelada) {
+            celda.tieneBandera = true
+        }
+    }
+
+    fun quitarBandera(fila: Int, columna: Int) {
+        val celda = tablero[fila][columna]
+        if (!celda.estaRevelada) {
+            celda.tieneBandera = false
+        }
     }
 }
