@@ -48,10 +48,10 @@ class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
     }
 
     fun reiniciar() {
-        buscaminas.reiniciar() // Reinicia el estado del tablero en la clase Buscaminas
-        tiempoTranscurrido.value = 0 // Reinicia el tiempo
-        juegoTerminado.value = false // Restablece la condición de juego terminado
-        bombaExplotada.value = false // Asegúrate de que el estado de la bomba explotada se restablezca
+        buscaminas.reiniciar()          // Reinicia el estado del tablero en la clase Buscaminas
+        tiempoTranscurrido.value = 0    // Reinicia el tiempo
+        juegoTerminado.value = false    // Restablece la condición de juego terminado
+        bombaExplotada.value = false    // Estado bomba explotada se restablece
 
         for (fila in tablero) {
             for (celda in fila) {
@@ -68,10 +68,12 @@ class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
         }
     }
 
-    fun quitarBandera(fila: Int, columna: Int) {
+
+    // No se usa
+    /*fun quitarBandera(fila: Int, columna: Int) {
         val celda = tablero[fila][columna]
         if (!celda.estaRevelada) {
             celda.tieneBandera = false
         }
-    }
+    }*/
 }
