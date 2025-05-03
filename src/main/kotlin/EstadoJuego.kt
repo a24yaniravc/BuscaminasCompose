@@ -8,6 +8,7 @@ class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
     var juegoTerminado = mutableStateOf(false)
     var bombaExplotada = mutableStateOf(false)
     var tiempoTranscurrido = mutableStateOf(0)
+    var contadorReinicio = mutableStateOf(0)       //Para el reinicio del reloj
 
     fun destapar(fila: Int, columna: Int) {
         if (juegoTerminado.value) return
@@ -39,10 +40,11 @@ class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
         return true
     }
 
+    // Si explota, revelar todo el tablero
     private fun revelarTodoElTablero() {
         for (fila in tablero) {
             for (celda in fila) {
-                celda.estaRevelada = true // Revelar todas las celdas
+                celda.estaRevelada = true
             }
         }
     }
@@ -52,13 +54,7 @@ class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
         tiempoTranscurrido.value = 0    // Reinicia el tiempo
         juegoTerminado.value = false    // Restablece la condición de juego terminado
         bombaExplotada.value = false    // Estado bomba explotada se restablece
-
-        for (fila in tablero) {
-            for (celda in fila) {
-                celda.estaRevelada = false
-                celda.tieneBandera = false
-            }
-        }
+        contadorReinicio.value++        // Reinicia el reloj
     }
 
     fun colocarBandera(fila: Int, columna: Int) {

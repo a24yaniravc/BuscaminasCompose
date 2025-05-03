@@ -1,6 +1,5 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -16,24 +15,22 @@ import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
 fun BuscaminasUI() {
-    // Estado del juego
     val estadoJuego = remember { EstadoJuego(8, 8, 10) }
 
     // Cronómetro
-    LaunchedEffect(estadoJuego) {
-        while (estadoJuego.juegoTerminado.value == false) {
+    LaunchedEffect(estadoJuego.contadorReinicio.value) {
+        while (!estadoJuego.juegoTerminado.value) {
             delay(1000L)
-            if (!estadoJuego.juegoTerminado.value) {
-                estadoJuego.tiempoTranscurrido.value++
-            }
+            estadoJuego.tiempoTranscurrido.value++
         }
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Tiempo: ${estadoJuego.tiempoTranscurrido.value} segundos")
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Si el juego ha terminado, mostrar el mensaje de victoria o derrota
+        // Ganar / Perder
         if (estadoJuego.juegoTerminado.value) {
             Text(
                 text = if (estadoJuego.bombaExplotada.value) "¡Has perdido! 💣" else "¡Has ganado! 🎉",
@@ -61,15 +58,15 @@ fun BuscaminasUI() {
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onLongPress = {
-                                        // Para clics largos (coloca o quita la bandera)
-                                        if(!celda.tieneBandera) {
+                                        // Colocar/Quitar bandera con pulsado largo
+                                        if (!celda.tieneBandera) {
                                             estadoJuego.colocarBandera(filaIndex, columnaIndex)
                                         } else {
-                                            estadoJuego.quitarBandera(filaIndex,columnaIndex)
+                                            estadoJuego.quitarBandera(filaIndex, columnaIndex)
                                         }
                                     },
                                     onTap = {
-                                        // Para clics cortos (destapa la celda)
+                                        // Si no tiene bandera y se hace un pulsado corto, destapa celda
                                         if (!celda.tieneBandera) {
                                             estadoJuego.destapar(filaIndex, columnaIndex)
                                         }
@@ -91,12 +88,12 @@ fun BuscaminasUI() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Button para reiniciar el juego
         Button(onClick = { estadoJuego.reiniciar() }) {
             Text("Reiniciar")
         }
     }
 }
+
 
 @Preview
 @Composable
