@@ -62,7 +62,11 @@ fun BuscaminasUI() {
                                 detectTapGestures(
                                     onLongPress = {
                                         // Para clics largos (coloca o quita la bandera)
-                                        estadoJuego.colocarBandera(filaIndex, columnaIndex)
+                                        if(!celda.tieneBandera) {
+                                            estadoJuego.colocarBandera(filaIndex, columnaIndex)
+                                        } else {
+                                            estadoJuego.quitarBandera(filaIndex,columnaIndex)
+                                        }
                                     },
                                     onTap = {
                                         // Para clics cortos (destapa la celda)

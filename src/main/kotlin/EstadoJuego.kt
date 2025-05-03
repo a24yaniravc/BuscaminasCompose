@@ -68,12 +68,10 @@ class EstadoJuego(filas: Int, columnas: Int, minas: Int) {
         }
     }
 
-
-    // No se usa
-    /*fun quitarBandera(fila: Int, columna: Int) {
+    fun quitarBandera(fila: Int, columna: Int) {
         val celda = tablero[fila][columna]
         if (!celda.estaRevelada) {
             celda.tieneBandera = false
         }
-    }*/
+    }
 }
